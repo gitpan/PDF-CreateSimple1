@@ -7,7 +7,7 @@ use PDF::API2;
 
 use 5.008002;
 
-our $VERSION = '1.0.0.5';
+our $VERSION = '1.0.0.6';
 
 use constant PI => 4 * atan2(1, 1);
 
@@ -27,7 +27,7 @@ sub new{
         $self->_setCurPage(1);
         
     }
-    
+
     $self->_setPDF($PDF);
     $self->setFilePath($filePath); # for retrieval when we'll want its content
                
@@ -324,12 +324,12 @@ sub drawRectangle{
     $gfx->rectxy(-(($x2-$x1)/2),-(($y2-$y1)/2),($x2-$x1)/2,($y2-$y1)/2);
     
     if ($fillcolor){
-        $gfx->fillstroke;    
+        $gfx->fillstroke;
     }
     else{
         $gfx->stroke;
     }
-    
+
     $self->_resetTransformation($gfx,($x1+$x2)/2,($y1+$y2)/2);
 }
 
@@ -582,22 +582,25 @@ sub drawText{
         
     my $fontObj = $self->_getFont($font);
     my $page    = $self->_getPage($pageNo);
-    my $gfx     = $page->text;
+    my $gfx     = $page->gfx;
     
-    $self->_applyTransformation($gfx,$x,$y);
+#     $self->_applyTransformation($gfx,$x,$y);
     $gfx->fillcolor($color);
     $gfx->font($fontObj,$fontSize);
     
     if ($align == 1){
-        $gfx->text_center($text); # centered
+#         $gfx->text_center($text); # centered
+        $gfx->textlabel($x,$y,$fontObj,$fontSize,$text,-color=>$color,-center=>1);
     }
     elsif($align == 2){
-        $gfx->text_right($text);  #right aligned
+#         $gfx->text_right($text);  #right aligned
+        $gfx->textlabel($x,$y,$fontObj,$fontSize,$text,-color=>$color,-right=>1);
     }
     else{
-        $gfx->text($text); # left aligned
+#         $gfx->text($text); # left aligned
+        $gfx->textlabel($x,$y,$fontObj,$fontSize,$text,-color=>$color);
     }
-    $self->_resetTransformation($gfx,$x,$y);
+#     $self->_resetTransformation($gfx,$x,$y);
  
 }
 
