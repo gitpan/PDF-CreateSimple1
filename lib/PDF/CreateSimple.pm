@@ -7,7 +7,7 @@ use PDF::API2;
 
 use 5.008002;
 
-our $VERSION = '1.0.0.6';
+our $VERSION = '1.0.0.7';
 
 use constant PI => 4 * atan2(1, 1);
 
@@ -538,8 +538,9 @@ sub drawImage{
 
 #INTERNAL FUNCTION, do not use outside scope
 sub _getImageObject{
-    my ($self,$imagePath,$ext) = @_;   
+    my ($self,$imagePath,$ext) = @_;
     
+    $ext = '' unless defined($ext);
     my $PDF = $self->getPDF;
     if ($ext && $ext eq 'tiff'){
         return $PDF->image_tiff($imagePath);
@@ -585,20 +586,20 @@ sub drawText{
     my $gfx     = $page->gfx;
     
 #     $self->_applyTransformation($gfx,$x,$y);
-    $gfx->fillcolor($color);
-    $gfx->font($fontObj,$fontSize);
-    
+#     $gfx->fillcolor($color);
+#     $gfx->font($fontObj,$fontSize);
+    my $rotation = $self->_getRotation || 0 ;
     if ($align == 1){
 #         $gfx->text_center($text); # centered
-        $gfx->textlabel($x,$y,$fontObj,$fontSize,$text,-color=>$color,-center=>1);
+        $gfx->textlabel($x,$y,$fontObj,$fontSize,$text,-color=>$color,-center=>1, -rotate=> $rotation);
     }
     elsif($align == 2){
 #         $gfx->text_right($text);  #right aligned
-        $gfx->textlabel($x,$y,$fontObj,$fontSize,$text,-color=>$color,-right=>1);
+        $gfx->textlabel($x,$y,$fontObj,$fontSize,$text,-color=>$color,-right=>1, -rotate=> $rotation);
     }
     else{
 #         $gfx->text($text); # left aligned
-        $gfx->textlabel($x,$y,$fontObj,$fontSize,$text,-color=>$color);
+        $gfx->textlabel($x,$y,$fontObj,$fontSize,$text,-color=>$color, -rotate=> $rotation);
     }
 #     $self->_resetTransformation($gfx,$x,$y);
  
