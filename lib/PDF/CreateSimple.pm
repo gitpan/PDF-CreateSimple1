@@ -7,12 +7,12 @@ use PDF::API2;
 
 use 5.008002;
 
-our $VERSION = '1.0.0.7';
+our $VERSION = '1.0.0.9';
 
 use constant PI => 4 * atan2(1, 1);
 
 sub new{
-    my ($class,$filePath,$templateFile) = @_;
+    my ($class,$filePath,$templateFile,$firstPageFormat) = @_;
     my $self = {};
     $self = bless($self, $class);
 
@@ -23,7 +23,8 @@ sub new{
     }
     else{
         $PDF = PDF::API2->new(-file => $filePath);
-        $PDF->page;
+        my $page = $PDF->page;
+        $page->mediabox($firstPageFormat) if $firstPageFormat;
         $self->_setCurPage(1);
         
     }
@@ -58,7 +59,7 @@ sub getFilePath{
 }
 
 sub addNewPage{
-    my ($self,$pageNo) = @_;  
+    my ($self,$format,$pageNo) = @_;  
     $pageNo = 0 unless $pageNo;
     my $PDF = $self->getPDF();
     
@@ -66,7 +67,9 @@ sub addNewPage{
         if $pageNo > $PDF->pages ||
            $pageNo < 0;
     
-    $PDF->page($pageNo);
+    my $page = $PDF->page($pageNo);
+    $page->mediabox($format) if $format;
+    
     $self->_setCurPage($pageNo);
     
     return $pageNo;
@@ -802,10 +805,11 @@ Reset both rotation and skewness to none.
 
 =head2 File Browsing
 
-=head3 addNewPage(pageNo)
+=head3 addNewPage(format,pageNo)
 
 Add a new page before the 'pageNo'th page (ex: addNewPage(1) will add at the beginnig, while addNewPage(3) will add between the second and third page)
 If pageNo is set to 0 or undef, it will add at the end.
+The following format are supported : '4A', '2A', 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', '4B', '2B', 'B0', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'LETTER', 'BROADSHEET', 'LEDGER', 'TABLOID', 'LEGAL', 'EXECUTIVE', and '36X36'. leaving it undefined will used the default 8 1/2* 11 format
 
 =head3 changePage(pageNo)
 
